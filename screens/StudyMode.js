@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { View, Text, Pressable, StyleSheet, FlatList, Dimensions, Image, ImageBackground, StatusBar } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -12,7 +12,6 @@ import { Entypo, FontAwesome5 } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import Logo from '../assets/flash-fire-mobile-background.gif';
 import { DbContext } from '../database/DbContext';
-import { useSound, SOUNDS } from '../hooks/useSound';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 
@@ -124,6 +123,7 @@ const SAMPLE_CARDS = [
 ];
 
 export default function Flashcards({ navigation, route }) {
+  const AudioRef = useRef(new Audio.Sound());
   const [cards, setCards] = useState(SAMPLE_CARDS);
   const [collectionName, setCollectionName] = useState();
   const [category, setCategory] = useState();
@@ -135,7 +135,6 @@ export default function Flashcards({ navigation, route }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const { collectionname } = route.params;
   const { getCollection, currentCollection, currentFlashcards } = useContext(DbContext);
-  // const { loadSources, playSound } = useSound();
 
   useEffect(() => {
     console.log('incoming name:', collectionname);
@@ -144,8 +143,6 @@ export default function Flashcards({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    // console.log('currentCollection:', currentCollection);
-    // console.log('currentFlashcards:', currentFlashcards);
     if (currentCollection && currentFlashcards) {
       populateCards(currentCollection, currentFlashcards);
     }
@@ -217,21 +214,27 @@ export default function Flashcards({ navigation, route }) {
     setShowAnswer(!showAnswer);
   };
 
+  const onPlaybackStatusUpdate = ({ uri, didJustFinish }) => {
+    if (didJustFinish) {
+      console.log('sound did just finish playing!');
+      setIsPlaying(false);
+    }
+  };
+
   const playSound = async () => {
     console.log('loading sound...');
     console.log('audiouri???', cards[cardIndex].audiouri);
     const sound = new Audio.Sound();
+    sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
     await sound.loadAsync({
       uri: cards[cardIndex].audiouri,
     });
+    const { isPlaying, isLoaded } = await sound.getStatusAsync();
+    console.log('isLoaded?', isLoaded);
     setSound(sound);
     console.log('playing sound....');
     setIsPlaying(true);
     await sound.playAsync();
-  };
-
-  const playAudio = async () => {
-    playSound(cards[cardIndex].audiouri, setIsPlaying);
   };
 
   useEffect(() => {
