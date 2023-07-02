@@ -1,0 +1,8 @@
+{
+  "login.signin.google.button": "Войти через Google",
+  "login.submit.button": "Отправки",
+  "login.signup.button": "Зарегистрироваться",
+  "login.login.title": "Авторизоваться",
+  "login.username.label": "Имя пользователя:",
+  "login.password.label": "Пароль"
+}

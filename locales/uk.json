@@ -1,0 +1,8 @@
+{
+  "login.signin.google.button": "Увійдіть за допомогою Google",
+  "login.submit.button": "Надіслати",
+  "login.signup.button": "Зареєструватися",
+  "login.login.title": "Логін",
+  "login.username.label": "Ім'я користувача",
+  "login.password.label": "Пароль"
+}
