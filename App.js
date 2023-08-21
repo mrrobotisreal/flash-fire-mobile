@@ -28,6 +28,7 @@ import Texts from './screens/Texts';
 import Translator from './screens/Translator';
 import Dictionary from './screens/Dictionary';
 import Chat from './screens/Chat';
+import Messages from './screens/Messages';
 
 /**
  * Hooks
@@ -39,6 +40,9 @@ import useFonts from './hooks/useFonts';
  */
 import { LocaleContextProvider, LocaleContext } from './context/LocaleContext';
 import { DbContextProvider } from './database/DbContext';
+import { UserContextProvider } from './context/UserContext';
+import { FlashcardsContextProvider } from './context/FlashcardsContext';
+import { SocketContextProvider } from './context/SocketContext';
 
 /**
  * Messages (Localization)
@@ -97,6 +101,7 @@ export default function App() {
     MyChemicalRomance: require('./assets/fonts/MyChemicalRomance-1X5Z.ttf'),
     Toxia: require('./assets/fonts/Toxia-OwOA.ttf'),
     Varukers: require('./assets/fonts/VarukersPersonalUse-K70Be.ttf'),
+    // NotoHebrew: require('./assets/fonts/NotoSerifHebrew-VariableFont_wdth,wght.ttf'),
   })
 
   const { changeLanguage, currentLang } = useContext(LocaleContext);
@@ -109,8 +114,9 @@ export default function App() {
         MyChemicalRomance: require('./assets/fonts/MyChemicalRomance-1X5Z.ttf'),
         Toxia: require('./assets/fonts/Toxia-OwOA.ttf'),
         Varukers: require('./assets/fonts/VarukersPersonalUse-K70Be.ttf'),
+        // NotoHebrew: require('./assets/fonts/NotoSerifHebrew-VariableFont_wdth,wght.ttf'),
       });
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (err) {
       console.error(err, err.stack);
     } finally {
@@ -142,114 +148,129 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaProvider>
-        <DbContextProvider>
-          <LocaleContextProvider>
-            <IntlProvider messages={messages[currentLang]} locale={deviceLocale} defaultLocale="en">
-              <NavigationContainer>
-                <Stack.Navigator>
-                  {!isAuthNd
-                    ? (
-                      <Stack.Screen
-                        name="Login"
-                        component={Login}
-                        options={{
-                          ...screenOptions,
-                          title: 'Geo Rekcart',
-                          headerShown: false,
-                        }}
-                      />
-                    )
-                    : (
-                      <Stack.Screen
-                        name="Home"
-                        component={Home}
-                        options={{
-                          ...screenOptions,
-                          title: 'Geo Rekcart',
-                          headerShown: false,
-                        }}
-                      />
-                    )
-                  }
-                  <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{
-                      ...screenOptions,
-                      title: 'Geo Rekcart',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="Flashcards"
-                    component={Flashcards}
-                    options={{
-                      ...subScreenOptions,
-                      title: '',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="CreateCollection"
-                    component={CreateCollection}
-                    options={{
-                      ...subScreenOptions,
-                      title: '',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="StudyMode"
-                    component={StudyMode}
-                    options={{
-                      ...subScreenOptions,
-                      title: '',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="Texts"
-                    component={Texts}
-                    options={{
-                      ...subScreenOptions,
-                      title: 'Geo Rekcart',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="Translator"
-                    component={Translator}
-                    options={{
-                      ...subScreenOptions,
-                      title: 'Geo Rekcart',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="Dictionary"
-                    component={Dictionary}
-                    options={{
-                      ...screenOptions,
-                      title: 'Geo Rekcart',
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="Chat"
-                    component={Chat}
-                    options={{
-                      ...subScreenOptions,
-                      title: 'Geo Rekcart',
-                      headerShown: false,
-                    }}
-                  />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </IntlProvider>
-          </LocaleContextProvider>
-        </DbContextProvider>
-      </SafeAreaProvider>
+      <UserContextProvider>
+        <SocketContextProvider>
+          <FlashcardsContextProvider>
+            <SafeAreaProvider>
+              <DbContextProvider>
+                <LocaleContextProvider>
+                  <IntlProvider messages={messages[currentLang]} locale={deviceLocale} defaultLocale="en">
+                    <NavigationContainer>
+                      <Stack.Navigator>
+                        {!isAuthNd
+                          ? (
+                            <Stack.Screen
+                              name="Login"
+                              component={Login}
+                              options={{
+                                ...screenOptions,
+                                title: 'Geo Rekcart',
+                                headerShown: false,
+                              }}
+                            />
+                          )
+                          : (
+                            <Stack.Screen
+                              name="Home"
+                              component={Home}
+                              options={{
+                                ...screenOptions,
+                                title: 'Geo Rekcart',
+                                headerShown: false,
+                              }}
+                            />
+                          )
+                        }
+                        <Stack.Screen
+                          name="Home"
+                          component={Home}
+                          options={{
+                            ...screenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Flashcards"
+                          component={Flashcards}
+                          options={{
+                            ...subScreenOptions,
+                            title: '',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="CreateCollection"
+                          component={CreateCollection}
+                          options={{
+                            ...subScreenOptions,
+                            title: '',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="StudyMode"
+                          component={StudyMode}
+                          options={{
+                            ...subScreenOptions,
+                            title: '',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Texts"
+                          component={Texts}
+                          options={{
+                            ...subScreenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Translator"
+                          component={Translator}
+                          options={{
+                            ...subScreenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Dictionary"
+                          component={Dictionary}
+                          options={{
+                            ...screenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Chat"
+                          component={Chat}
+                          options={{
+                            ...subScreenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="Messages"
+                          component={Messages}
+                          options={{
+                            ...subScreenOptions,
+                            title: 'Geo Rekcart',
+                            headerShown: false,
+                          }}
+                        />
+                      </Stack.Navigator>
+                    </NavigationContainer>
+                  </IntlProvider>
+                </LocaleContextProvider>
+              </DbContextProvider>
+            </SafeAreaProvider>
+          </FlashcardsContextProvider>
+        </SocketContextProvider>
+      </UserContextProvider>
     </GestureHandlerRootView>
   );
 }

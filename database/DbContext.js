@@ -2,6 +2,7 @@ import { useState, useEffect, createContext } from 'react';
 import axios from 'axios';
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
+import * as Sentry from 'sentry-expo';
 import { Asset } from 'expo-asset';
 import * as Sharing from 'expo-sharing';
 // import * as bcrypt from 'bcryptjs';
@@ -31,18 +32,43 @@ export const DbContext = createContext();
 //   return SQLite.openDatabase('flashFire.db');
 // }
 
+let flashfireDB;
+async function initDB() {
+  // Check if the directory where we are going to put the database exists
+  let dirInfo;
+  try {
+      dirInfo = await FileSystem.getInfoAsync(`${FileSystem.documentDirectory}SQLite`);
+  } catch(err) { Sentry.Native.captureException(err) };
+
+  if (!dirInfo.exists) {
+    try {
+      await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}SQLite`, { intermediates: true });
+    } catch(err) { Sentry.Native.captureException(err) }
+  };
+
+  // Downloads the db from the original file
+  // The db gets loaded as read only
+  FileSystem.downloadAsync(
+    Asset.fromModule(require('../databases/flashfire.db')).uri,
+      `${FileSystem.documentDirectory}SQLite/flashfire.db`
+    ).then(() => {
+    flashfireDB = SQLite.openDatabase(`flashfire.db`); // We open our downloaded db
+  }).catch(err => Sentry.Native.captureException(err));
+}
+// initDB();
+
 const openDB = () => {
   return SQLite.openDatabase('flashFire.db');
 };
 
-const checkShare = async () => {
-  await Sharing.shareAsync(
-    FileSystem.documentDirectory + 'SQLite/main',
-    {dialogTitle: 'share or copy your DB via'}
- ).catch(error =>{
-    console.log(error);
- })
-}
+// const checkShare = async () => {
+//   await Sharing.shareAsync(
+//     FileSystem.documentDirectory + 'SQLite/main',
+//     {dialogTitle: 'share or copy your DB via'}
+//  ).catch(error =>{
+//     console.log(error);
+//  })
+// }
 
 export const DbContextProvider = ({ children }) => {
   // const db = SQLite.openDatabase('flashFire.db');
@@ -56,6 +82,8 @@ export const DbContextProvider = ({ children }) => {
   const [flashcards, setFlashcards] = useState();
   const [currentFlashcards, setCurrentFlashcards] = useState();
   const [textsCollection, setTextsCollection] = useState();
+  const [contacts, setContacts] = useState();
+  const [contactChatHistory, setContactChatHistory] = useState();
 
   useEffect(() => {
     // openDatabase
@@ -74,8 +102,13 @@ export const DbContextProvider = ({ children }) => {
     db.transaction(tx => {
       tx.executeSql('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, email TEXT)')
     },
-    () => {},
-    () => {});
+    (err) => {
+      console.log('I think this is the error callback?');
+      console.error(err);
+    },
+    () => {
+      console.log('I think this is the success callback?')
+    });
 
     // db.transaction(tx => {
     //   tx.executeSql('CREATE TABLE IF NOT EXISTS collections (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, collectionname TEXT, category TEXT');
@@ -99,31 +132,26 @@ export const DbContextProvider = ({ children }) => {
   }, [db]);
 
   useEffect(() => {
-    // db.transaction(tx => {
-    //   tx.executeSql('CREATE TABLE IF NOT EXISTS collections (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, collectionname TEXT, category TEXT)');
-    // },
-    // (err) => {
-    //   console.error(err);
-    //   return true;
-    // },
-    // () => {});
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS collections (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, collectionname TEXT, category TEXT)');
+    },
+    (err) => {
+      console.error(err);
+      return true;
+    },
+    () => {});
   }, []);
 
   useEffect(() => {
-    // db.transaction(tx => {
-    //   tx.executeSql('CREATE TABLE IF NOT EXISTS flashcards (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, collectionname TEXT, question TEXT, answer TEXT, audiouri TEXT, imageuri TEXT)');
-    // },
-    // (err) => {
-    //   console.error(err);
-    //   return true;
-    // },
-    // () => {});
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS flashcards (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, collectionname TEXT, question TEXT, answer TEXT, audiouri TEXT, imageuri TEXT)');
+    },
+    (err) => {
+      console.error(err);
+      return true;
+    },
+    () => {});
   }, []);
-
-  useEffect(() => {
-    // console.log('USERS:', users);
-  }, [users]);
-  console.log('currentUser is:', currentUser);
 
   const checkDB = async () => {
     db.transaction(tx => {
@@ -190,10 +218,11 @@ export const DbContextProvider = ({ children }) => {
       tx.executeSql('SELECT * FROM users WHERE username = ?', [username],
         (txObj, resultSet) => {
           console.log('get resultSet:', resultSet.rows._array);
-          let user = resultSet.rows._array[0];
-          console.log('user.password', user.password);
+          let user = resultSet.rows._array.length > 0 ? resultSet.rows._array[0] : null;
+          console.log('user is:', user);
+          console.log('user.password', user?.password);
           console.log('password', password);
-          user.isAuthenticated = checkUnamePword(username, user.password, password);
+          user.isAuthenticated = checkUnamePword(username, user?.password, password);
           console.log('USER after auth:', user)
           setCurrentUser(user);
         },
@@ -215,19 +244,36 @@ export const DbContextProvider = ({ children }) => {
     }
   };
 
-  const addUserWithUnameAndPword = async (username, password, email) => {
-    const hashedPassword = hashPassword(password);
+  const addUserWithUnameAndPword = (username, password, email) => {
+    // const hashedPassword = hashPassword(password);
     console.log('ADDING USER!');
+    axios.post('http://10.0.2.2:8889/createUser', {
+      username,
+      password,
+      email,
+    })
+      .then(({ data }) => {
+        //
+      })
+      .catch((err) => console.error(err));
     db.transaction(tx => {
-      tx.executeSql(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, [username, hashedPassword, email],
+      tx.executeSql(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, [username, password, email],
         (txObj, resultSet) => {
           console.log('ADD USER resultSet:', resultSet.rows._array);
+          getUserWithUnameAndPword(username, password);
         },
         (txObj, error) => {
+          console.log('An error happened adding the new user')
           console.error(error);
           return true;
         },
       );
+    },
+    () => {
+      console.log('Is there an error??? WTF is wrong?')
+    },
+    () => {
+      console.log('Is it successful???  I have no freaking clue because this does not work AT ALL')
     })
   };
 
@@ -315,6 +361,23 @@ export const DbContextProvider = ({ children }) => {
   const fetchGoogleTexts = () => {};
 
   /**
+   * Chat
+   */
+  const getContacts = () => {};
+
+  const getMessagesFromContact = (contact) => {
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM messages WHERE username = ? AND contactname = ?', [currentUser?.username, contact],
+        (txObj, resultSet) => setContactChatHistory(resultSet.rows._array),
+        (txObj, error) => {
+          console.error(error);
+          return true;
+        }
+      );
+    });
+  };
+
+  /**
    * My tools
    */
   const manualDelete = async (table, collectionName) => {
@@ -371,6 +434,10 @@ export const DbContextProvider = ({ children }) => {
     currentFlashcards,
     getCollection,
     collections,
+    contacts,
+    contactChatHistory,
+    getContacts,
+    getMessagesFromContact,
   }
 
   return (

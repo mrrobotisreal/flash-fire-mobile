@@ -25,7 +25,7 @@ const _deviceLocale = devicePlatform === 'android' ?
 const deviceLocale = _deviceLocale.split(/[-_]/)[0];
 
 export const LocaleContext = createContext({
-  currentLang: 'en',
+  currentLang: deviceLocale,
   changeLanguage: () => {},
 });
 

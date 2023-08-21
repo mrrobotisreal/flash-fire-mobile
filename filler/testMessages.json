@@ -1,0 +1,156 @@
+[
+  {
+    username: 'iamwintrow',
+    message_content: {
+      hasImage: false,
+      messageContent: 'Hi beautiful! I am so happy to see you and I like you very much ❤️',
+    },
+    send_date: 'July 15, 2023 07:48:00',
+    sender_username: 'iamwintrow',
+    recipient_username: 'alina.ranok',
+    has_been_read: false,
+  },
+  {
+    username: 'iamwintrow',
+    message_content: {
+      hasImage: false,
+      messageContent: 'How is your day going so far?',
+    },
+    send_date: 'July 15, 2023 07:50:00',
+    sender_username: 'iamwintrow',
+    recipient_username: 'alina.ranok',
+    has_been_read: false,
+  },
+  {
+    username: 'alina.ranok',
+    message_content: {
+      hasImage: false,
+      messageContent: 'Goooood morning my world 🤗 my day is going very well, and I\'m so happy to talk with you.',
+    },
+    send_date: 'July 15, 2023 07:51:00',
+    sender_username: 'alina.ranok',
+    recipient_username: 'iamwintrow',
+    has_been_read: false,
+  },
+  {
+    username: 'alina.ranok',
+    message_content: {
+      hasImage: false,
+      messageContent: 'I like you very much, my Mitch 🤗 ❤️',
+    },
+    send_date: 'July 15, 2023 07:51:00',
+    sender_username: 'alina.ranok',
+    recipient_username: 'iamwintrow',
+    has_been_read: false,
+  },
+  {
+    username: 'iamwintrow',
+    message_content: {
+      hasImage: false,
+      messageContent: 'My world, you are amazing and I like you so much 🥰. I\'m so happy you are having a great day, and I am very happy to talk with you too 😘. Maybe we can play chicken foot/fish today!',
+    },
+    send_date: 'July 15, 2023 07:52:00',
+    sender_username: 'iamwintrow',
+    recipient_username: 'alina.ranok',
+    has_been_read: false,
+  },
+  {
+    username: 'alina.ranok',
+    message_content: {
+      hasImage: false,
+      messageContent: 'Ohhhh yes let\'s play! That sounds like so much fun',
+    },
+    send_date: 'July 15, 2023 07:53:00',
+    sender_username: 'alina.ranok',
+    recipient_username: 'iamwintrow',
+    has_been_read: false,
+  },
+  {
+    username: 'iamwintrow',
+    message_content: {
+      hasImage: false,
+      messageContent: 'Perfect my love! I will text you after I finish cooking breakfast 😘',
+    },
+    send_date: 'July 15, 2023 07:55:00',
+    sender_username: 'iamwintrow',
+    recipient_username: 'alina.ranok',
+    has_been_read: false,
+  },
+]
+
+
+
+const SAMPLE = [
+  {
+    id: 0,
+    collectionname: "Русские карточки",
+    category: "These are sample Russian flashcards.",
+  },
+  {
+    id: 1,
+    collectionname: "Flashcards tiếng Việt",
+    category: "These are sample Vietnamese flashcards.",
+  },
+  {
+    id: 2,
+    collectionname: '中文抽認卡',
+    category: 'These are sample Chinese flashcards.',
+  },
+  {
+    id: 3,
+    collectionname: 'כרטיסי פלאש בעברית',
+    category: 'These are sample Hebrew flashcards.',
+  },
+  {
+    id: 4,
+    collectionname: 'Data structures',
+    category: 'These are sample data structure flashcards.',
+  },
+  {
+    id: 5,
+    collectionname: 'Countries',
+    category: 'These are sample culture flashcards from countries around the world.',
+  },
+  {
+    id: 6,
+    collectionname: 'Cultures',
+    category: 'These are sample cultural tradition flashcards.',
+  },
+  {
+    id: 7,
+    collectionname: 'Exercises',
+    category: 'These are sample flashcards about healthy exercises.',
+  },
+  {
+    id: 8,
+    collectionname: 'Final',
+    category: 'This is the final collection just being used to see if it will make it scrollable.',
+  }
+];
+
+const CONTACTS = [
+  {
+    username: "alina.ranok",
+    hasNewMessages: true,
+    // lastTimestamp: new Date().toTimeString(),
+    last_interaction_date: 1690683252410,
+  },
+  {
+    username: "Thảo",
+    hasNewMessages: false,
+    // lastTimestamp: new Date().toTimeString(),
+    last_interaction_date: 1690120410986,
+  },
+  {
+    username: "(Hebrew class) נועה",
+    hasNewMessages: true,
+    // lastTimestamp: new Date().toTimeString(),
+    last_interaction_date: 1690433244629,
+  },
+  {
+    username: "Юля (Russian class)",
+    hasNewMessages: true,
+    // lastTimestamp: new Date().toTimeString(),
+    last_interaction_date: 1690623247504,
+  },
+];
